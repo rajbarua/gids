@@ -1,20 +1,7 @@
-# Similarity Search
-We will use a local Hazelcast deployment and MC along with Python virtual environment. Currently Hazelcast supports upto 3.7 therefore we will use [pyenv](https://github.com/pyenv/pyenv) to manage multiple python version on the local machine.
-## Installations
-This guide is written for local installation of Hazelcast but it can be extended for cloud and other installations.
-1. Make sure Hazelcast is installed via brew or other ways
-1. Install `pyenv` using `brew install pyenv` and `echo 'eval "$(pyenv init -)"' >> ~/.zshrc`
-1. Install python 3.7 latest as `pyenv install 3.7`
-1. Change into project directory and switch to python 3.7 using `cd ~/src/gids; pyenv local 3.7`
-1. Then create a pythin virtual environment and activate it `python -m venv .venv`, `source .venv/bin/activate`
-1. Install Python dependencies `pip install -U ipykernel`
 
-`python3 -m venv .venv`
+# GIDS 2024 Demo
 
-### References
-1. [Blog](https://dzone.com/articles/boosting-similarity-search-with-stream-processing)
-
-# Supercharging Kafka Applications with Real-time Contextual Insights
+## Supercharging Kafka Applications with Real-time Contextual Insights
 ### Setup
 1. Run kafka `docker pull apache/kafka:3.7.0` and then `docker run -d -p 9092:9092 --name kafka apache/kafka:3.7.0`
 2. Exec into the container `docker exec -it kafka bash` and `cd opt/kafka/bin`
@@ -190,3 +177,18 @@ ON tro.customer= hl.customer
 AND hl.window_end BETWEEN tro.order_ts AND tro.order_ts + INTERVAL '0.1' SECONDS;
 ```
 
+## Similarity Search
+We will use a local Hazelcast deployment and MC along with Python virtual environment. Currently Hazelcast supports upto 3.7 therefore we will use [pyenv](https://github.com/pyenv/pyenv) to manage multiple python version on the local machine.
+### Installations
+This guide is written for local installation of Hazelcast but it can be extended for cloud and other installations.
+1. Make sure Hazelcast is installed via brew or other ways
+1. Install `pyenv` using `brew install pyenv` and `echo 'eval "$(pyenv init -)"' >> ~/.zshrc`
+1. Install python 3.7 latest as `pyenv install 3.7`
+1. Change into project directory and switch to python 3.7 using `cd ~/src/gids; pyenv local 3.7`
+1. Then create a pythin virtual environment and activate it `python -m venv .venv`, `source .venv/bin/activate`
+1. Install Python dependencies `pip install -U ipykernel`
+
+`python3 -m venv .venv`
+
+### References
+1. [Blog](https://dzone.com/articles/boosting-similarity-search-with-stream-processing)
