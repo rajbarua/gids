@@ -4,12 +4,12 @@
 ## Supercharging Kafka Applications with Real-time Contextual Insights
 ### Setup
 1. Run kafka `docker pull apache/kafka:3.7.0` and then `docker run -d -p 9092:9092 --name kafka apache/kafka:3.7.0`
-2. Exec into the container `docker exec -it kafka bash` and `cd opt/kafka/bin`
-3. Start Hazelcast using docker `export HZ_LICENSEKEY=$(cat ~/hazelcast/demo.license)` and `hz start`
-1. Also run Management Centre as `hz-mc start`
+1. Start Hazelcast `hz start`. See [installation](https://docs.hazelcast.com/hazelcast/latest/getting-started/install-hazelcast) guidelines. If you use [EE](https://docs.hazelcast.com/hazelcast/latest/getting-started/install-enterprise) then you need to `export HZ_LICENSEKEY=$(cat ~/hazelcast/demo.license)`.
+3. Also run Management Centre as `hz-mc start`
 1. Configure CLC by adding a config `clc config add dev cluster.name=dev cluster.address=localhost:5701`
-1. Log into DBeaver or CLC 
 1. Connect to clc using `clc -c dev`
+1. Optional: Exec into the container `docker exec -it kafka bash` and `cd opt/kafka/bin`
+1. Optional: Follow the same steps in any SQL client, like DBeaver
 
 ### Demo
 Goal is to read from a Kafka topic which is emitting a json with an e-commerce data stream. Each message contains - id, customer, price, order_ts and amount.
@@ -48,7 +48,7 @@ CREATE JOB IF NOT EXISTS push_orders
     OPTIONS (
     'processingGuarantee' = 'exactlyOnce',
     'snapshotIntervalMillis' = '5000')
-     AS
+    AS
     SINK INTO orders (
         SELECT id,
         CASE WHEN userRand BETWEEN 0 AND 0.1 THEN 'Elmer Fudd'
@@ -140,7 +140,46 @@ JOIN enrich
 ON enrich.customer = orders.customer 
 AND enrich.colour2 = 'red';
 ```
-5. We can also join two streams if needed
+5. While we can run this as an ad-hoc continuous query but we can also run as a job to store that into an IMap
+First create a Mapping to this new IMap
+```sql
+CREATE or REPLACE MAPPING destination_map(
+    __key BIGINT,
+    customer VARCHAR,
+    colour1 VARCHAR,
+    colour2 VARCHAR,
+    colour3 VARCHAR,
+    price DECIMAL,
+    amount BIGINT  )
+TYPE IMap
+OPTIONS (
+    'keyFormat'='bigint',
+    'valueFormat'='json-flat');
+```
+Now lets push data into an IMap
+```sql
+CREATE JOB IF NOT EXISTS push_orders_imap
+AS
+    SINK INTO destination_map (
+        SELECT
+            orders.id AS Id,
+            orders.customer AS Symbol,
+            enrich.colour1 as colour1,
+            enrich.colour2 as colour2,
+            enrich.colour3 as colour3,
+            ROUND(orders.price,2) AS Price,
+            orders.amount AS "Sold"
+        FROM orders
+        JOIN enrich
+        ON enrich.customer = orders.customer 
+        AND enrich.colour2 = 'red'
+    );
+```
+Cancel job even
+```sql
+ALTER JOB push_orders_imap SUSPEND;
+```
+6. We can also join two streams if needed
 First we create one more view of the order view 
 ```sql
 CREATE OR REPLACE VIEW orders_ordered AS
@@ -178,15 +217,17 @@ AND hl.window_end BETWEEN tro.order_ts AND tro.order_ts + INTERVAL '0.1' SECONDS
 ```
 
 ## Similarity Search
-We will use a local Hazelcast deployment and MC along with Python virtual environment. Currently Hazelcast supports upto 3.7 therefore we will use [pyenv](https://github.com/pyenv/pyenv) to manage multiple python version on the local machine.
+We will use a local Hazelcast deployment and MC along with Python virtual environment. We will use [pyenv](https://github.com/pyenv/pyenv) to manage multiple python version on the local machine. For this demo we will use Python 3.11.
 ### Installations
 This guide is written for local installation of Hazelcast but it can be extended for cloud and other installations.
 1. Make sure Hazelcast is installed via brew or other ways
 1. Install `pyenv` using `brew install pyenv` and `echo 'eval "$(pyenv init -)"' >> ~/.zshrc`
-1. Install python 3.7 latest as `pyenv install 3.7`
-1. Change into project directory and switch to python 3.7 using `cd ~/src/gids; pyenv local 3.7`
+1. Install python 3.11 latest as `pyenv install 3.11`
+1. Change into project directory and switch to python 3.7 using `cd ~/src/gids; pyenv local 3.11`
 1. Then create a pythin virtual environment and activate it `python -m venv .venv`, `source .venv/bin/activate`
-1. Install Python dependencies `pip install -U ipykernel`
+1. Install Python dependencies `pyenv exec pip install -U ipykernel qdrant-client sentence-transformers hazelcast-python-client`
+1. Run qdrant `docker run -p 6333:6333 -v $(pwd)/qdrant_storage:/qdrant/storage qdrant/qdrant`
+1. 
 
 `python3 -m venv .venv`
 
