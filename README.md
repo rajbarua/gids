@@ -225,11 +225,11 @@ This guide is written for local installation of Hazelcast but it can be extended
 1. Install python 3.11 latest as `pyenv install 3.11`
 1. Change into project directory and switch to python 3.7 using `cd ~/src/gids; pyenv local 3.11`
 1. Then create a pythin virtual environment and activate it `python -m venv .venv`, `source .venv/bin/activate`
-1. Install Python dependencies `pyenv exec pip install -U ipykernel qdrant-client sentence-transformers hazelcast-python-client`
+1. Install Python dependencies `pyenv exec pip install -U ipykernel qdrant-client sentence-transformers hazelcast-python-client jupyter`
 1. Run qdrant `docker run -p 6333:6333 -v $(pwd)/qdrant_storage:/qdrant/storage qdrant/qdrant`
-1. 
+1. Start Hazelcast `hz start` and optionally Management Centre `hz-mc start`
+1. Switch to Notebook `jupyter notebook`
 
-`python3 -m venv .venv`
 
 ### References
 1. [Blog](https://dzone.com/articles/boosting-similarity-search-with-stream-processing)
