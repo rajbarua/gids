@@ -1,0 +1,18 @@
+{
+    "orders": [
+        {
+            "id": "ORD001",
+            "customer": "Wile E. Coyote",
+            "price": 299.99,
+            "order_ts": "2023-11-14T10:30:00Z",
+            "amount": 2
+        },
+        {
+            "id": "ORD002",
+            "customer": "Jane Doe",
+            "price": 149.50,
+            "order_ts": "2023-11-14T11:45:00Z",
+            "amount": 1
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 
-# GIDS 2024 Demo
+# GIDS Demo
 
 ## Supercharging Kafka Applications with Real-time Contextual Insights
 ### Setup
